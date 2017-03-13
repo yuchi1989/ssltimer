@@ -12,3 +12,6 @@ A timing attack exploits data-dependent behaviorial charactoristics of the imple
 ## Project plan
 
 ## Related work
+
+## Reference
+Brumley, D., & Boneh, D. (2005). Remote timing attacks are practical. Computer Networks, 48(5), 701-716.
