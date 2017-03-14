@@ -7,9 +7,13 @@
 #### Yuchi Tian
 
 ## Motivation
-A timing attack exploits data-dependent behaviorial charactoristics of the implementation of an algorithm. Some implementions of cryptographic algorithms including RSA are vulnerable to timing attack. In these implementations, there may exist a correlation between key and the encryption time and the time information can be exploited to infer keys. The information leaked by measuring time can also be combined with other cryptanlaysis techniques to make the attack more effective. If the implementation of SSL is vulnerable to timing attack, it will cause critical security and privacy issues. There is no existing tools focuing on testing the timing attack vulnerability. Thus I propose to design and implement a tool SSLTimer that can test if an implementation of SSL is vulnerable to timing attack.
+A timing attack exploits data-dependent behaviorial charactoristics of the implementation of an algorithm. Some implementions of cryptographic algorithms including RSA are vulnerable to timing attack. In these implementations, there may exist a correlation between key and the encryption time and the time information can be exploited to infer keys. The information leaked by measuring time can also be combined with other cryptanlaysis techniques to make the attack more effective. If the implementation of SSL is vulnerable to timing attack, it will cause critical security and privacy issues. There is no existing tools focuing on testing the timing attack vulnerability. Thus in this project I will try to design and implement a tool SSLTimer that can analyze and test if an implementation of SSL is vulnerable to timing attack.
 
 ## Project plan
+1. Configure the server environment using some SSL implementation to be tested. 
+2. Implement the SSL handshake.  
+3. Analyze if there is a correlation between key and execution time for some crypto options and specific SSL implementation using statistical methods.  
+4. Identify if the anlaysis process can be automated and complete the remaining part of this tool.  
 
 ## Related work
 
