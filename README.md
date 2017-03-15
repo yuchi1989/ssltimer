@@ -16,7 +16,8 @@ The project involves an exploration of some statistical techniques for general a
 2. Analyze if there is a correlation between key and execution time for some crypto options and specific SSL implementation using statistical techniques.  
 3. Identify if the anlaysis process can be automated and complete the remaining part of this tool.  
 
-### Reference
+### Resources
 Brumley, D., & Boneh, D. (2005). Remote timing attacks are practical. Computer Networks, 48(5), 701-716.  
 Brumley, B. B., & Tuveri, N. (2011, September). Remote timing attacks are still practical. In European Symposium on Research in Computer Security (pp. 355-371). Springer Berlin Heidelberg.  
 Morgan, T. D., & Morgan, J. W. (2015). Web Timing Attacks Made Practical.  
+Al Fardan, N. J., & Paterson, K. G. (2013, May). Lucky thirteen: Breaking the TLS and DTLS record protocols. In Security and Privacy (SP), 2013 IEEE Symposium on (pp. 526-540). IEEE.  
