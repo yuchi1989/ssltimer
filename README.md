@@ -7,10 +7,12 @@
 Yuchi Tian  
 
 ### Motivation
-A timing attack exploits data-dependent behaviorial charactoristics of the implementation of an algorithm. Some implementions of cryptographic algorithms including RSA are vulnerable to timing attack. In these implementations, there may exist a correlation between key and the encryption time and the time information can be exploited to infer keys. The information leaked by measuring time can also be combined with other cryptanlaysis techniques to make the attack more effective. If the implementation of SSL is vulnerable to timing attack, it will cause critical security and privacy issues. There is no existing tools focuing on testing the timing attack vulnerability. Thus in this project I will try to design and implement a tool SSLTimer that can analyze and test if an implementation of SSL is vulnerable to timing attack.
+A timing attack exploits data-dependent behaviorial charactoristics of the implementation of an algorithm. Some implementions of cryptographic algorithms including RSA are vulnerable to timing attack. In these implementations, there may exist a correlation between key and the encryption time and the time information can be exploited to infer keys. The information leaked by measuring time can also be combined with other cryptanlaysis techniques to make the attack more effective. If the implementation of SSL is vulnerable to timing attack, it will cause critical security and privacy issues. There is no existing tools focuing on testing SSL implementations with respect to the timing attack vulnerability. Thus in this project I will try to design and implement a tool SSLTimer that can analyze and test if an implementation of SSL is vulnerable to timing attack.   
+  
+The project involves an exploration of some statistical techniques for general anlaysis of correlation between key and encryption time or decryption time for some specific crypto options in an SSL implementation. It may be based on the assumption that the tested servers and SSLTimer are in the same LAN network.
 
 ### Project plan
-1. Configure the SSL server environment and implement the SSL handshake protocol.  
+1. Configure the SSL server environment using SSL implementations and implement the SSL handshake protocol.  
 2. Analyze if there is a correlation between key and execution time for some crypto options and specific SSL implementation using statistical techniques.  
 3. Identify if the anlaysis process can be automated and complete the remaining part of this tool.  
 
