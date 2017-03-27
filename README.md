@@ -22,3 +22,4 @@ Brumley, B. B., & Tuveri, N. (2011, September). Remote timing attacks are still 
 Morgan, T. D., & Morgan, J. W. (2015). Web Timing Attacks Made Practical.  
 Al Fardan, N. J., & Paterson, K. G. (2013, May). Lucky thirteen: Breaking the TLS and DTLS record protocols. In Security and Privacy (SP), 2013 IEEE Symposium on (pp. 526-540). IEEE.  
 Chapman, P., & Evans, D. (2011, October). Automated black-box detection of side-channel vulnerabilities in web applications. In Proceedings of the 18th ACM conference on Computer and communications security (pp. 263-274). ACM.  
+Scapy-SSL/TLS: https://github.com/tintinweb/scapy-ssl_tls
