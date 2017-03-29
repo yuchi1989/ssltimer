@@ -9,6 +9,7 @@ from scapy.layers.ssl_tls_crypto import *
 import scapy.layers.ssl_tls as tls
 import time
 
+start_time = 0
 tls_version = TLSVersion.TLS_1_2
 #ciphers = [TLSCipherSuite.ECDHE_RSA_WITH_AES_128_GCM_SHA256]
 #ciphers = [TLSCipherSuite.ECDHE_RSA_WITH_AES_256_CBC_SHA384]
@@ -58,6 +59,7 @@ def tls_do_round_trip_1(tls_socket, pkt, recv=True):
     resp = TLS()
     try:
         tls_socket.sendall(pkt)
+        global start_time
         start_time = time.time()
         if recv:
             resp = tls_socket.recvall()
@@ -66,7 +68,8 @@ def tls_do_round_trip_1(tls_socket, pkt, recv=True):
                 if alert.level != TLSAlertLevel.WARNING:
                     level = TLS_ALERT_LEVELS.get(alert.level, "unknown")
                     description = TLS_ALERT_DESCRIPTIONS.get(alert.description, "unknown description")
-                    print("--- %s seconds ---" % (time.time() - start_time))
+                    if start_time != 0:
+                        print("--- %s seconds ---" % (time.time() - start_time))
                     raise TLSProtocolError("%s alert returned by server: %s" % (level.upper(), description.upper()), pkt, resp)
     except socket.error as se:
         raise TLSProtocolError(se, pkt, resp)
@@ -85,7 +88,7 @@ def tls_handshake_1(tls_socket, version, ciphers, extensions=[]):
                               TLSHandshakes(handshakes=[TLSHandshake() /
                                                         tls_socket.tls_ctx.get_client_kex_data()])
         client_ccs = TLSRecord(version=version) / TLSChangeCipherSpec()
-        tls_do_round_trip(tls_socket, TLS.from_records([client_key_exchange, client_ccs]), False)
+        tls_do_round_trip_1(tls_socket, TLS.from_records([client_key_exchange, client_ccs]), False)
         
         #resp2 = tls_do_round_trip(tls_socket, TLSHandshakes(handshakes=[TLSHandshake() /
                                                                         #TLSFinished(data=tls_socket.tls_ctx.get_verify_data())]))
