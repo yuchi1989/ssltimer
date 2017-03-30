@@ -16,7 +16,7 @@ A timing attack exploits data-dependent behaviorial charactoristics of the imple
 ### Project plan
 1. Implement SSL handshake protocol to initiate a handshake with a SSL server and explore an accurate timing method using CPU cycles.  
 2. Analyze if an implementation of SSL is vulnerable to the timing attack on RSA decryption.
-3. Identify if the anlaysis process can be automated and complete the remaining part of this tool.  
+3. Identify if the analysis process can be automated and complete the remaining part of this tool.  
 
 ### Resources
 Brumley, D., & Boneh, D. (2005). Remote timing attacks are practical. Computer Networks, 48(5), 701-716.  
