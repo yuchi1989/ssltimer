@@ -14,7 +14,7 @@ A timing attack exploits data-dependent behaviorial charactoristics of the imple
   
 
 ### Project plan
-1. Implement SSL handshake protocol to automatically collect timing samples from a SSL server.  
+1. Implement SSL handshake protocol to automatically collect timing samples from an SSL server.  
 2. Analyze if an implementation of SSL is vulnerable to the timing attack on RSA decryption.
 3. Identify if the analysis process can be automated and complete the remaining part of this tool.  
 
