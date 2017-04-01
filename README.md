@@ -10,13 +10,13 @@ Yuchi Tian
 In this project, I will begin with reproducing [Remote Timing Attacks are Practical](https://crypto.stanford.edu/~dabo/papers/ssl-timing.pdf) in a LAN network setting. Then I will move the server to EC2 and try to explore the statistical ways to identify the timing attack vulnerability by collecting the timing samples from remote servers and analyzing these data.
 
 ### Motivation
-A timing attack exploits data-dependent behaviorial charactoristics of the implementation of an algorithm. Some implementions of cryptographic algorithms including RSA are vulnerable to timing attack. In these implementations, there may exist a correlation between key and the encryption time and the time information can be exploited to infer keys. The information leaked by measuring time can also be combined with other cryptanlaysis techniques to make the attack more effective. If the implementation of SSL is vulnerable to timing attack, it will cause critical security and privacy issues. There is no existing tools focuing on testing SSL implementations with respect to the timing attack vulnerability. Thus in this project I will try to design and implement a tool SSLTimer that can analyze and test if an implementation of SSL is vulnerable to timing attack on RSA decryption.   
+A timing attack exploits data-dependent behaviorial charactoristics of the implementation of an algorithm. Some implementions of cryptographic algorithms including RSA are vulnerable to timing attack. In these implementations, there may exist a correlation between key and the encryption time and the time information can be exploited to infer keys. The information leaked by measuring time can also be combined with other cryptanlaysis techniques to make the attack more effective. If the implementation of SSL is vulnerable to timing attack, it will cause critical security and privacy issues. There is no existing tools focuing on testing SSL implementations with respect to the timing attack vulnerability. Thus in this project I will try to implement a tool SSLTimer that can collect timing samples from an SSL server and analyze the statistical features of the data to decide if it is vulnerable to timing attack.   
   
 
 ### Project plan
-1. Implement SSL handshake protocol to automatically collect timing samples from an SSL server.  
-2. Analyze if an implementation of SSL is vulnerable to the timing attack on RSA decryption.
-3. Identify if the analysis process can be automated and complete the remaining part of this tool.  
+1. Implement SSL handshake protocol to automatically collect timing samples from an SSL server.  (Done)
+2. Analyze the statistical features of the timing data to decide if it is vulnerable to timing attack. (4/3-4/12)
+3. Identify if the analysis process can be automated and complete the remaining part of this tool.  (4/13-4/20)
 
 ### Resources
 Brumley, D., & Boneh, D. (2005). Remote timing attacks are practical. Computer Networks, 48(5), 701-716.  
