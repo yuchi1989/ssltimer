@@ -22,6 +22,9 @@ SSL:
    * openssl 0.9.7a
    * openssl 0.9.8
    * openssl 1.0.2  
+
+Protocol version:
+  * SSLv3 - TLSv1.2
   
 Timer:  
 * According to RFC 5246, using these cipher suite, as a client initiates a handshake with a TLS server, a 48-byte premaster secret will be encrypted using the public key of the server and sent to server in an ClientKeyExchange message. Then the server will decrypt the premaster secret with its private key. RFC 5246 requires that the 48-byte premaster secret begins with client_version(2 bytes) and followed by 46 random bytes. If the first two bytes are different from the client version, an alert "bad_record_mac" will be sent back from the server and the connection will be terminated by server. By timing the process from the clientKeyExchange message is sent to the alert "bad_record_mac" is received, we can approximate the time that the server uses to decrypt this encrypted premaster secret.  
@@ -49,4 +52,5 @@ Al Fardan, N. J., & Paterson, K. G. (2013, May). Lucky thirteen: Breaking the TL
 Chapman, P., & Evans, D. (2011, October). Automated black-box detection of side-channel vulnerabilities in web applications. In Proceedings of the 18th ACM conference on Computer and communications security (pp. 263-274). ACM.  
 Scapy-SSL/TLS: https://github.com/tintinweb/scapy-ssl_tls  
 RFC 5246: https://tools.ietf.org/html/rfc5246  
+RFC 6101: https://tools.ietf.org/html/rfc6101  
 mimoo/timing_attack_ecdsa_tls : https://github.com/mimoo/timing_attack_ecdsa_tls  
