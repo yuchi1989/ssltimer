@@ -8,9 +8,12 @@ from scapy.layers.ssl_tls import *
 from scapy.layers.ssl_tls_crypto import *
 import scapy.layers.ssl_tls as tls
 import time
+import numpy
+import csv
 
 start_time = 0
-tls_version = TLSVersion.TLS_1_2
+time_diff = 0
+tls_version = TLSVersion.TLS_1_0
 #ciphers = [TLSCipherSuite.ECDHE_RSA_WITH_AES_128_GCM_SHA256]
 #ciphers = [TLSCipherSuite.ECDHE_RSA_WITH_AES_256_CBC_SHA384]
 ciphers = [TLSCipherSuite.RSA_WITH_AES_128_CBC_SHA]
@@ -58,21 +61,28 @@ def verify_data_1(tls_ctx, data=None):
 
 def tls_do_round_trip_1(tls_socket, pkt, recv=True):
     resp = TLS()
+    global start_time
+    global time_diff
     try:
-        tls_socket.sendall(pkt)
-        global start_time
+        tls_socket.sendall(pkt)        
         start_time = time.time()
         if recv:
+            if start_time != 0:
+                time_diff = time.time() - start_time
             resp = tls_socket.recvall()
             if resp.haslayer(TLSAlert):
                 alert = resp[TLSAlert]
                 if alert.level != TLSAlertLevel.WARNING:
                     level = TLS_ALERT_LEVELS.get(alert.level, "unknown")
                     description = TLS_ALERT_DESCRIPTIONS.get(alert.description, "unknown description")
-                    if start_time != 0:
-                        print("--- %s seconds ---" % (time.time() - start_time))
+                    if time_diff != 0:
+                        print("--- %s seconds ---" % (time_diff))
                     raise TLSProtocolError("%s alert returned by server: %s" % (level.upper(), description.upper()), pkt, resp)
     except socket.error as se:
+        if start_time != 0:
+            time_diff = time.time() - start_time
+        if time_diff != 0:
+            print("--- %s seconds ---" % (time_diff))
         raise TLSProtocolError(se, pkt, resp)
     return resp
 
@@ -113,34 +123,112 @@ def tls_handshake_1(tls_socket, version, ciphers, premaster_key=None, extensions
 
 
 def tls_timer(ip, premaster_key = None):
+    global start_time
+    global time_diff    
+    start_time = 0
+    time_diff = 0
     with TLSSocket(client=True) as tls_socket:
         try:
+            #tls_socket._s = socket.socket()
+            tls_socket.__init__(sock=socket.socket(), client=True)
             tls_socket.connect(ip)
             print("Connected to server: %s" % (ip,))
         except socket.timeout:
             print("Failed to open connection to server: %s" % (ip,), file=sys.stderr)
+        except socket.error, v:
+            print ("Unexpected error:", sys.exc_info()[0])
+            print (v[0])
         else:
             try:
                 server_hello, server_kex = tls_handshake_1(tls_socket, tls_version, ciphers, premaster_key, extensions)
                 server_hello.show()
             except TLSProtocolError as tpe:
+                
+                #tpe.response.show()
+                
+                if time_diff != 0:
+                    return time_diff
+                elif start_time != 0:
+                    time_diff = time.time() - start_time
+                    print("---- %s seconds ----" % (time_diff))
                 print("Got TLS error: %s" % tpe, file=sys.stderr)
-                tpe.response.show()
+                return time_diff
+
             except NotImplementedError as nie:
-                print("NotImplementedError: %s" % nie, file=sys.stderr) 
+                print("NotImplementedError: %s" % nie, file=sys.stderr)
+                return 0
             else:
                 resp = tls_socket.do_round_trip(TLSPlaintext(data="GET / HTTP/1.1\r\nHOST: www.google.com\r\n\r\n"))
                 print("Got response from server")
                 resp.show()
+                return 0
             finally:
-                print(tls_socket.tls_ctx)
-                pass
+                #print(tls_socket.tls_ctx)
+                return time_diff
 
+def splus(s1,s2):    
+    # convert strings to a list of character pair tuples
+    # go through each tuple, converting them to ASCII code (ord)
+    # perform exclusive or on the ASCII code
+    # then convert the result back to ASCII (chr)
+    # merge the resulting array of characters as a string
+    return ''.join(chr(ord(a) + ord(b)) for a,b in zip(s1,s2))
 
 if __name__ == "__main__":
     if len(sys.argv) > 2:
         server = (sys.argv[1], int(sys.argv[2]))
     else:
         server = ("172.217.7.142", 443)
-    tls_timer(server,"a"*48)
+    """
+    pmsdata = range(256*256)
+    timingdata = []
+    pms = "\x00\x00"
+    for i in range(256):
+        for j in range(256):
+            hexdump(pms)            
+            key = pms + "\x00" * 46
+            time_list = []
+            for k in range(10):
+                try:
+                    dtime = tls_timer(server,key)
+                    
+                except:
+                    pass
+                finally:
+                    time_list.append(dtime)
+            timingdata.append(numpy.median(numpy.array(time_list)))
+            if j != 255:
+                pms = splus(pms, "\x00\x01")
+        pms = pms[0] + "\x00"
+        if i != 255:
+            pms = splus(pms, "\x01\x00")
+
+    with open('timingdata.csv', 'wb') as csvfile:
+        writer = csv.writer(csvfile)
+        for i in pmsdata:
+            writer.writerow([str(pmsdata[i])] + [str(timingdata[i])])
+    """
+    pmsdata = range(16)
+    timingdata = []
+    pms = "\xd0"
+    for i in range(16):        
+        hexdump(pms)            
+        key = "\x00"*16 + pms + "\x00" * 31
+        time_list = []
+        for k in range(10):
+            try:
+                dtime = tls_timer(server,key)                
+            except:
+                pass
+            finally:
+                time_list.append(dtime)
+                #print(time_list)
+        timingdata.append(numpy.median(numpy.array(time_list)))
+        if i != 15:
+            pms = splus(pms, "\x01")
+    with open('timingdata.csv', 'wb') as csvfile:
+        writer = csv.writer(csvfile)
+        for i in pmsdata:
+            writer.writerow([str(pmsdata[i])] + [str(timingdata[i])])
+    #tls_timer(server,"a"*48)
     #tls_timer(server)
