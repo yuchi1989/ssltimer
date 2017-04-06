@@ -32,6 +32,11 @@ Timer:
 Intuition:
 * We believe that if a server use blinding to protect itself from timing attack, the statistical features of the timing data will be different from the statistical features of the data collected from a server that is vulnerable to timing attack.
 
+Statistical features:
+
+* Timing data distribution with same input
+* Timing data variance with different input
+
 ### Project plan
 1. Implement SSL handshake protocol to automatically collect timing samples from an SSL server.  (Done)
 2. Analyze the statistical features of the timing data to decide if it is vulnerable to timing attack. (4/3-4/12)
