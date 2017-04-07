@@ -49,17 +49,12 @@ By collecting and analyzing timing data, I will try to explore a statistical way
 ### Result
 Timing data distribution with same input
 
-<figure>
-    <img src='https://github.com/yuchi1989/ssltimer/blob/master/result/figure_2(bli).png' alt='missing' width="600"/>
-    <figcaption>Caption goes here</figcaption>
-</figure>
-
 <img src="https://github.com/yuchi1989/ssltimer/blob/master/result/figure_2(bli).png" width="600">  
 
-SSL server using blind  
+                  Figure1: timing data distribution for SSL server using blind  
 <img src="https://github.com/yuchi1989/ssltimer/blob/master/result/figure_2(vul).png" width="600">  
 
-vulnerable SSL server  
+                  Figure2: timing data distribution forvulnerable SSL server
 
 ### Threats to Validity   
 Timing attack can happen in RSA signature process or decryption process.  In this project, we only test the cipher suites where RSA is used for key agreement and authentication and test the side channel from the RSA decryption process.  
