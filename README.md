@@ -46,6 +46,21 @@ Statistical features:
 
 By collecting and analyzing timing data, I will try to explore a statistical way and automate the process to decide if an SSL server is vulnerable to timing attack on RSA decryption or if an SSL server is immune to this attack by using blinding.  
 
+### Result
+Timing data distribution with same input
+
+<figure>
+    <img src='https://github.com/yuchi1989/ssltimer/blob/master/result/figure_2(bli).png' alt='missing' width="600"/>
+    <figcaption>Caption goes here</figcaption>
+</figure>
+
+<img src="https://github.com/yuchi1989/ssltimer/blob/master/result/figure_2(bli).png" width="600">  
+
+SSL server using blind  
+<img src="https://github.com/yuchi1989/ssltimer/blob/master/result/figure_2(vul).png" width="600">  
+
+vulnerable SSL server  
+
 ### Threats to Validity   
 Timing attack can happen in RSA signature process or decryption process.  In this project, we only test the cipher suites where RSA is used for key agreement and authentication and test the side channel from the RSA decryption process.  
 
