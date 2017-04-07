@@ -51,10 +51,10 @@ Timing data distribution with same input
 
 <img src="https://github.com/yuchi1989/ssltimer/blob/master/result/figure_2(bli).png" width="600">  
 
-                  Figure1: timing data distribution for SSL server using blind  
+                  Figure1: timing data distribution for SSL servers using blind  
 <img src="https://github.com/yuchi1989/ssltimer/blob/master/result/figure_2(vul).png" width="600">  
 
-                  Figure2: timing data distribution forvulnerable SSL server
+                  Figure2: timing data distribution for vulnerable SSL servers
 
 ### Threats to Validity   
 Timing attack can happen in RSA signature process or decryption process.  In this project, we only test the cipher suites where RSA is used for key agreement and authentication and test the side channel from the RSA decryption process.  
