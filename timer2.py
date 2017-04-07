@@ -10,6 +10,8 @@ import scapy.layers.ssl_tls as tls
 import time
 import numpy
 import csv
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 
 start_time = 0
 time_diff = 0
@@ -64,8 +66,9 @@ def tls_do_round_trip_1(tls_socket, pkt, recv=True):
     global start_time
     global time_diff
     try:
-        tls_socket.sendall(pkt)        
-        start_time = time.time()
+        tls_socket.sendall(pkt)
+        if start_time == 0:
+            start_time = time.time()
         if recv:
             if start_time != 0:
                 time_diff = time.time() - start_time
@@ -95,12 +98,12 @@ def tls_handshake_1(tls_socket, version, ciphers, premaster_key=None, extensions
                                                  TLSClientHello(version=version,
                                                                 cipher_suites=ciphers,
                                                                 extensions=extensions)])
-        hexdump(tls_socket.tls_ctx.premaster_secret)
+        #hexdump(tls_socket.tls_ctx.premaster_secret)
         resp1 = tls_do_round_trip(tls_socket, client_hello)
         #if premaster_key != None:
             #tls_socket.tls_ctx.premaster_secret = premaster_key
         #tls_socket.tls_ctx.premaster_secret = "%s%s" % (struct.pack("!H", client_hello.version), 'a'*46)
-        
+        #hexdump(tls_socket.tls_ctx.premaster_secret)
         client_key_exchange = TLSRecord(version=version) / \
                               TLSHandshakes(handshakes=[TLSHandshake() /
                                                         tls_socket.tls_ctx.get_client_kex_data()])
@@ -141,7 +144,7 @@ def tls_timer(ip, premaster_key = None):
         else:
             try:
                 server_hello, server_kex = tls_handshake_1(tls_socket, tls_version, ciphers, premaster_key, extensions)
-                server_hello.show()
+                #server_hello.show()
             except TLSProtocolError as tpe:
                 
                 #tpe.response.show()
@@ -160,10 +163,10 @@ def tls_timer(ip, premaster_key = None):
             else:
                 resp = tls_socket.do_round_trip(TLSPlaintext(data="GET / HTTP/1.1\r\nHOST: www.google.com\r\n\r\n"))
                 print("Got response from server")
-                resp.show()
+                #resp.show()
                 return 0
             finally:
-                #print(tls_socket.tls_ctx)
+                #print(tls_socket.tls_ctx)                
                 return time_diff
 
 def splus(s1,s2):    
@@ -174,11 +177,70 @@ def splus(s1,s2):
     # merge the resulting array of characters as a string
     return ''.join(chr(ord(a) + ord(b)) for a,b in zip(s1,s2))
 
+def scale(x_np):
+    np_minmax = (x_np - x_np.min()) / (x_np.max() - x_np.min())
+    return np_minmax
+
+def test_variance_with_diff_input(server):
+    pmsdata = range(16)
+    timingdata = []
+    data_to_plot = []
+    pms = "\xd0"
+    for i in range(16):        
+        hexdump(pms)            
+        key = "\x00\x00"+"\x00"*14 + pms + "\x00" * 31
+        time_list = []
+        for k in range(20):
+            try:
+                dtime = tls_timer(server,key)                
+            except:
+                pass
+            finally:
+                time_list.append(dtime)
+                #print(time_list)
+        timingdata.append(numpy.median(numpy.array(time_list)))
+        data_to_plot.append(numpy.array(time_list))
+        if i != 15:
+            pms = splus(pms, "\x01")
+    
+    print(numpy.var(scale(numpy.array(timingdata))))
+    print ("-------------------------")
+    variance = []
+    for d in data_to_plot:
+        variance.append(numpy.var(d))
+        print (numpy.var(d))
+    print ("-------------------------")
+    print(numpy.mean(numpy.array(variance)))
+
+    #with open('timingdata.csv', 'wb') as csvfile:
+        #writer = csv.writer(csvfile)
+        #for i in pmsdata:
+            #writer.writerow([str(pmsdata[i])] + [str(timingdata[i])])
+    mpl_fig = plt.figure()
+    ax = mpl_fig.add_subplot(111)
+    ax.boxplot(data_to_plot)
+    plt.show()
+def test_distribution_with_same_input(server):
+    key = "\x11" * 48
+    time_list = []
+    for k in range(100):
+        try:
+            dtime = tls_timer(server,key) 
+        except:
+            pass
+        finally:
+            time_list.append(dtime)
+    x = numpy.array(time_list)
+    n, bins, patches = plt.hist(x, 50, normed=1, facecolor='green', alpha=0.75)
+    plt.show()
 if __name__ == "__main__":
     if len(sys.argv) > 2:
         server = (sys.argv[1], int(sys.argv[2]))
     else:
         server = ("172.217.7.142", 443)
+    #test_variance_with_diff_input(server)
+    test_distribution_with_same_input(server)
+    #tls_timer(server, "\x00"*48)
     """
     pmsdata = range(256*256)
     timingdata = []
@@ -208,27 +270,34 @@ if __name__ == "__main__":
         for i in pmsdata:
             writer.writerow([str(pmsdata[i])] + [str(timingdata[i])])
     """
-    pmsdata = range(16)
+    """
+    test variance with different input
+    """
+    
+    
+    """
+    pmsdata = range(3)
     timingdata = []
-    pms = "\xd0"
-    for i in range(16):        
+    data_to_plot = []
+    pms = "\xd7"
+    for i in range(3):        
         hexdump(pms)            
         key = "\x00"*16 + pms + "\x00" * 31
         time_list = []
-        for k in range(10):
+        for k in range(20):
             try:
-                dtime = tls_timer(server,key)                
+                dtime = tls_timer(server,key)
             except:
                 pass
             finally:
                 time_list.append(dtime)
                 #print(time_list)
         timingdata.append(numpy.median(numpy.array(time_list)))
-        if i != 15:
-            pms = splus(pms, "\x01")
+        pms = splus(pms, "\x01")
     with open('timingdata.csv', 'wb') as csvfile:
         writer = csv.writer(csvfile)
         for i in pmsdata:
             writer.writerow([str(pmsdata[i])] + [str(timingdata[i])])
+    """
     #tls_timer(server,"a"*48)
     #tls_timer(server)
