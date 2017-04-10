@@ -12,6 +12,7 @@ import numpy
 import csv
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import pickle
 
 start_time = 0
 time_diff = 0
@@ -25,6 +26,13 @@ ciphers = [TLSCipherSuite.RSA_WITH_AES_128_CBC_SHA]
 extensions = [TLSExtension() / TLSExtECPointsFormat(),
               TLSExtension() / TLSExtSupportedGroups()]
 
+def save_object(obj, filename):
+    with open(filename, 'wb') as output:
+        pickle.dump(obj, output, pickle.HIGHEST_PROTOCOL)
+
+def load_object(filename):
+    with open(filename, 'rb') as input:
+        return pickle.load(input)
 
 def verify_data_1(tls_ctx, data=None):
 
@@ -52,12 +60,12 @@ def verify_data_1(tls_ctx, data=None):
 
     if tls_ctx.negotiated.version == tls.TLSVersion.TLS_1_2:
         prf_verify_data = tls_ctx.prf.get_bytes(tls_ctx.master_secret, label,
-                                             tls_ctx.prf.digest.new("".join(verify_data)).digest(),
+                                             tls_ctx.prf.digest.new("aaa".join(verify_data)).digest(),
                                              num_bytes=12)
     else:
         prf_verify_data = tls_ctx.prf.get_bytes(tls_ctx.master_secret, label,
-                                             "%s%s" % (MD5.new("".join(verify_data)).digest(),
-                                                       SHA.new("".join(verify_data)).digest()),
+                                             "%s%s" % (MD5.new("aaa".join(verify_data)).digest(),
+                                                       SHA.new("aaa".join(verify_data)).digest()),
                                              num_bytes=12)
     return prf_verify_data
 
@@ -222,13 +230,13 @@ def test_variance_with_diff_input(server):
     ax.boxplot(data_to_plot)
     plt.show()
 
-def reject_outliers(data, m=2):
+def reject_outliers(data, m=4):
     return data[abs(data - numpy.mean(data)) < m * numpy.std(data)]
 
 def test_distribution_with_same_input(server):
-    key = "\x10" * 48
+    key = "\x03\x03" * 24
     time_list = []
-    for k in range(200):
+    for k in range(100):
         try:
             dtime = tls_timer(server,key) 
         except:
@@ -241,74 +249,46 @@ def test_distribution_with_same_input(server):
     n, bins, patches = plt.hist(x, 50, normed=1, facecolor='green', alpha=0.75)
     plt.show()
 
+def comp_distribution_with_same_input(server1, server2):
+    key = "\x03\x03" * 24
+    time_list = []
+    for k in range(100):
+        try:
+            while (dtime == 0):
+                dtime = tls_timer(server1,key) 
+        except:
+            pass
+        finally:
+            if dtime != 0:
+                time_list.append(dtime)
+    x1 = numpy.array(time_list)
+    save_object(x1,"data1.obj")
+    x1 = reject_outliers(x1)
 
+    key = "\x03\x03" * 24
+    time_list = []
+    for k in range(200):
+        try:
+            while (dtime == 0):
+                dtime = tls_timer(server2,key)
+        except:
+            pass
+        finally:
+            time_list.append(dtime)
+    x2 = numpy.array(time_list)
+    save_object(x2,"data2.obj")
+    x2 = reject_outliers(x2)
+    
+    f, (ax1, ax2) = plt.subplots(1, 2, sharey=True)
+    ax1.hist(x1, 50, normed=1, facecolor='green', alpha=0.75)
+    ax2.hist(x2, 50, normed=1, facecolor='green', alpha=0.75)
+    plt.show()
 
 if __name__ == "__main__":
-    if len(sys.argv) > 2:
+    if len(sys.argv) == 3:
         server = (sys.argv[1], int(sys.argv[2]))
-    else:
-        server = ("172.217.7.142", 443)
-    #test_variance_with_diff_input(server)
-    
-    test_distribution_with_same_input(server)
-    #tls_timer(server, "\x00"*48)
-    """
-    pmsdata = range(256*256)
-    timingdata = []
-    pms = "\x00\x00"
-    for i in range(256):
-        for j in range(256):
-            hexdump(pms)            
-            key = pms + "\x00" * 46
-            time_list = []
-            for k in range(10):
-                try:
-                    dtime = tls_timer(server,key)
-                    
-                except:
-                    pass
-                finally:
-                    time_list.append(dtime)
-            timingdata.append(numpy.median(numpy.array(time_list)))
-            if j != 255:
-                pms = splus(pms, "\x00\x01")
-        pms = pms[0] + "\x00"
-        if i != 255:
-            pms = splus(pms, "\x01\x00")
-
-    with open('timingdata.csv', 'wb') as csvfile:
-        writer = csv.writer(csvfile)
-        for i in pmsdata:
-            writer.writerow([str(pmsdata[i])] + [str(timingdata[i])])
-    """
-    """
-    test variance with different input
-    """
-    
-    
-    """
-    pmsdata = range(3)
-    timingdata = []
-    data_to_plot = []
-    pms = "\xd7"
-    for i in range(3):        
-        hexdump(pms)            
-        key = "\x00"*16 + pms + "\x00" * 31
-        time_list = []
-        for k in range(20):
-            try:
-                dtime = tls_timer(server,key)
-            except:
-                pass
-            finally:
-                time_list.append(dtime)
-                #print(time_list)
-        timingdata.append(numpy.median(numpy.array(time_list)))
-        pms = splus(pms, "\x01")
-    with open('timingdata.csv', 'wb') as csvfile:
-        writer = csv.writer(csvfile)
-        for i in pmsdata:
-            writer.writerow([str(pmsdata[i])] + [str(timingdata[i])])
-    """
-    #tls_timer(server,"a"*48)
-    #tls_timer(server)
+        test_distribution_with_same_input(server)
+    elif len(sys.argv) == 5:
+        server1 = (sys.argv[1], int(sys.argv[2])) 
+        server2 = (sys.argv[3], int(sys.argv[4])) 
+        comp_distribution_with_same_input(server1,server2)
