@@ -51,12 +51,13 @@ Timing data distribution with same input
 
 <img src="https://github.com/yuchi1989/ssltimer/blob/master/result/figure_2(bli).png" width="600">  
 
-                  Figure1: timing data distribution for SSL servers using blind  
+         Figure1: timing data distribution for SSL servers using blind  
 <img src="https://github.com/yuchi1989/ssltimer/blob/master/result/figure_2(vul).png" width="600">  
 
-                  Figure2: timing data distribution for vulnerable SSL servers
+         Figure2: timing data distribution for vulnerable SSL servers
 <img src="https://github.com/yuchi1989/ssltimer/blob/master/result/figure_6.png" width="600">  
-                  Figure3: linearSVC classifier
+
+                          Figure3: linearSVC classifier
 
 Data: X: (100,2) Y: (100,)  
 10 fold cross validation result: **0.92** (accuracy)  
