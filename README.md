@@ -55,6 +55,13 @@ Timing data distribution with same input
 <img src="https://github.com/yuchi1989/ssltimer/blob/master/result/figure_2(vul).png" width="600">  
 
                   Figure2: timing data distribution for vulnerable SSL servers
+<img src="https://github.com/yuchi1989/ssltimer/blob/master/result/figure_6.png" width="600">  
+                  Figure3: linearSVC classifier
+
+Data: X: (100,2) Y: (100,)  
+10 fold cross validation result: **0.92** (accuracy)  
+[ 1.   0.9  0.8  1.   0.8  1.   1.   1.   0.9  0.8]
+
 
 ### Threats to Validity   
 Timing attack can happen in RSA signature process or decryption process.  In this project, we only test the cipher suites where RSA is used for key agreement and authentication and test the side channel from the RSA decryption process.  
