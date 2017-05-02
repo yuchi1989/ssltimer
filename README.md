@@ -1,16 +1,19 @@
 # ssltimer
 
 ### Title
+### [slides](https://docs.google.com/a/virginia.edu/presentation/d/134ILvlbyl5amdfGbwuomMzfeKx-8t_G-0JNtCQrmRKQ/edit?usp=sharing)
 #### SSLTimer: Testing an SSL Implementation with respect to Timing Attack Vulnerability
 
 ### Team
 Yuchi Tian  
 
+
 ### Introduction
-In this project, I will begin with reproducing [Remote Timing Attacks are Practical](https://crypto.stanford.edu/~dabo/papers/ssl-timing.pdf) in a LAN network setting. Then I will move the server to EC2 and try to explore the statistical ways to identify the timing attack vulnerability by collecting the timing samples from remote servers and analyzing these data.
+In this project, I will design and implement SSLTimer, a tool that can identify if a SSL secured web server is vulnerable to a specific timing attack by only interacting with the web server remotely. Specifically, I will use the RSA timing vulnerability discussed in [Remote Timing Attacks are Practical](https://crypto.stanford.edu/~dabo/papers/ssl-timing.pdf). 
 
 ### Motivation
-A timing attack exploits data-dependent behaviorial charactoristics of the implementation of an algorithm. Some implementions of cryptographic algorithms including RSA are vulnerable to timing attack. In these implementations, there may exist a correlation between key and the encryption time and the time information can be exploited to infer keys. The information leaked by measuring time can also be combined with other cryptanlaysis techniques to make the attack more effective. If the implementation of SSL is vulnerable to timing attack, it will cause critical security and privacy issues. There is no existing tools focuing on testing SSL implementations with respect to the timing attack vulnerability. Thus in this project I will try to implement a tool SSLTimer that can collect timing samples from an SSL server and analyze the statistical features of the data to decide if it is vulnerable to timing attack.   
+A timing attack exploits data-dependent behaviorial charactoristics of the implementation of an algorithm. Some implementions of cryptographic algorithms including RSA are vulnerable to timing attack. In these implementations, there may exist a correlation between key and the encryption time and the time information can be exploited to infer keys. The information leaked by measuring time can also be combined with other cryptanlaysis techniques to make the attack more effective. If the implementation of SSL is vulnerable to timing attack, it will cause critical security and privacy issues. There is no existing tools focuing on testing SSL implementations with respect to the timing attack vulnerability. Thus in this project, I will propose a statistic based black-box test methodology to identify if an SSL secured web server is vulnerable to a specific timing attack. I will also design and implement a tool SSLTimer to automate the whole testing process.
+
   
 ### Methodology
 CipherSuite: 
@@ -29,13 +32,6 @@ Protocol version:
 Timer:  
 * According to RFC 5246, using these cipher suite, as a client initiates a handshake with a TLS server, a 48-byte premaster secret will be encrypted using the public key of the server and sent to server in an ClientKeyExchange message. Then the server will decrypt the premaster secret with its private key. RFC 5246 requires that the 48-byte premaster secret begins with client_version(2 bytes) and followed by 46 random bytes. If the first two bytes are different from the client version, an alert "bad_record_mac" will be sent back from the server and the connection will be terminated by server. By timing the process from the clientKeyExchange message is sent to the alert "bad_record_mac" is received, we can approximate the time that the server uses to decrypt this encrypted premaster secret.  
 
-Intuition:
-* We believe that if a server use blinding to protect itself from timing attack, the statistical features of the timing data will be different from the statistical features of the data collected from a server that is vulnerable to timing attack.
-
-Statistical features:
-
-* Timing data distribution with same input
-* Timing data variance with different input
 
 ### Project plan
 1. Implement SSL handshake protocol to automatically collect timing samples from an SSL server.  (Done)
@@ -46,7 +42,7 @@ Statistical features:
 
 By collecting and analyzing timing data, I will try to explore a statistical way and automate the process to decide if an SSL server is vulnerable to timing attack on RSA decryption or if an SSL server is immune to this attack by using blinding.  
 
-### Result
+### Evaluation
 Timing data distribution with same input
 
 <img src="https://github.com/yuchi1989/ssltimer/blob/master/result/figure_2(bli).png" width="600">  
@@ -65,7 +61,9 @@ Data: X: (100,2) Y: (100,)
 
 
 ### Threats to Validity   
-Timing attack can happen in RSA signature process or decryption process.  In this project, we only test the cipher suites where RSA is used for key agreement and authentication and test the side channel from the RSA decryption process.  
+SSLTimer cannot guarantee whether the tested servers are vulnerable or not.
+Even SSLTimer gets 0 variance as result, it still cannot guarantee the vulnerability because the blinding techniques may intentionally trick it.
+When SSLTimer gets very large variance, it means that the server is not vulnerable to this attack at this moment and this environment. (Testing the same servers in different time and environments are necessary).
 
 ### Resources
 Brumley, D., & Boneh, D. (2005). Remote timing attacks are practical. Computer Networks, 48(5), 701-716.  
