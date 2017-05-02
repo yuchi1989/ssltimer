@@ -31,10 +31,10 @@ By collecting and analyzing timing data, I will try to explore a statistical way
 #### Peak Feature
 <img src="https://github.com/yuchi1989/ssltimer/blob/master/result/figure_22.png" width="500"> 
 
-The figure above is example result of timing the RSA decryption of all the possible combination of the top two bits.  
+The figure above is an example result of timing the RSA decryption of all the possible combination of the top two bits.  
 The peak feature of the result is  [1, 0, 1, 0]. 1 means peak while 0 means not peak.  Then we will do the timing twice, get two peak features and compute the variance
   
-For example, if we get same peak feature for two consecutive timing as follows. Then we will get 0 mean variance. 
+For example, if we get same peak feature for two consecutive timing as follows. Then we will get 0 mean variance.   
 First round:  
 Peak feature [1, 0, 1, 0]  
 Second round:  
@@ -43,9 +43,9 @@ Variance = [0, 0, 0, 0]
 Mean Variance = 0  
 
 The mean variance range from 0 to 0.25. The following example shows a case with maximum mean variance.  
-First round:
+First round:  
 Peak feature [0, 1, 0, 1]  
-Second round:
+Second round:  
 Peak feature [1, 0, 1, 0]  
 Variance [0.25, 0.25, 0.25, 0.25]  
 Mean Variance 0.25  
@@ -53,33 +53,19 @@ Mean Variance 0.25
 If the SSL server is vulnerable, the two peak features for two consecutive timing should be similar. We will use mean variance to decide if the SSL server is vulnerable or not. If the mean variance is 0 or close to 0, then the SSL server is vulnerable. If the mean variance is not close to 0, then the SSL server is not vulnerable.  
 
 ### Implementation
-* According to RFC 5246, using these cipher suite, as a client initiates a handshake with a TLS server, a 48-byte premaster secret will be encrypted using the public key of the server and sent to server in an ClientKeyExchange message. Then the server will decrypt the premaster secret with its private key. RFC 5246 requires that the 48-byte premaster secret begins with client_version(2 bytes) and followed by 46 random bytes. If the first two bytes are different from the client version, an alert "bad_record_mac" will be sent back from the server and the connection will be terminated by server. By timing the process from the clientKeyExchange message is sent to the alert "bad_record_mac" is received, we can approximate the time that the server uses to decrypt this encrypted premaster secret.  
+According to RFC 5246, using these cipher suite, as a client initiates a handshake with a TLS server, a 48-byte premaster secret will be encrypted using the public key of the server and sent to server in an ClientKeyExchange message. Then the server will decrypt the premaster secret with its private key. RFC 5246 requires that the 48-byte premaster secret begins with client_version(2 bytes) and followed by 46 random bytes. If the first two bytes are different from the client version, an alert "bad_record_mac" will be sent back from the server and the connection will be terminated by server. By timing the process from the clientKeyExchange message is sent to the alert "bad_record_mac" is received, we can approximate the time that the server uses to decrypt this encrypted premaster secret.  
 
 
  
 
 ### Evaluation
-Timing data distribution with same input
 
-<img src="https://github.com/yuchi1989/ssltimer/blob/master/result/figure_2(bli).png" width="600">  
-
-         Figure1: timing data distribution for SSL servers using blind  
-<img src="https://github.com/yuchi1989/ssltimer/blob/master/result/figure_2(vul).png" width="600">  
-
-         Figure2: timing data distribution for vulnerable SSL servers
-<img src="https://github.com/yuchi1989/ssltimer/blob/master/result/figure_6.png" width="600">  
-
-                          Figure3: linearSVC classifier
-
-Data: X: (100,2) Y: (100,)  
-10 fold cross validation result: **0.92** (accuracy)  
-[ 1.   0.9  0.8  1.   0.8  1.   1.   1.   0.9  0.8]
 
 
 ### Threats to Validity   
 SSLTimer cannot guarantee whether the tested servers are vulnerable or not.
 Even SSLTimer gets 0 variance as result, it still cannot guarantee the vulnerability because the blinding techniques may intentionally trick it.
-When SSLTimer gets very large variance, it means that the server is not vulnerable to this attack at this moment and this environment. (Testing the same servers in different time and environments are necessary).
+When SSLTimer gets very large variance, it means that the server is not vulnerable to this attack at this moment and this environment. (Testing the same server in different time and environments are necessary).
 
 ### Resources
 Brumley, D., & Boneh, D. (2005). Remote timing attacks are practical. Computer Networks, 48(5), 701-716.  
