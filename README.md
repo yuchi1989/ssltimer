@@ -49,7 +49,7 @@ According to RFC 5246, using RSA for key agreement, as a client initiates a hand
 
 We can use any input as the premaster secret in a ClientKeyExchange message and send it to the TLS server. The server will decrypt it using the private key. But if the input does not meet the format of a 48-byte premaster secret, the TLS server will send an alert "bad_record_mac" and terminate the connection. 
 
-I will use our guessed q as the premaster secret and timing the process from sending the ClientKeyExchange message to receiving the TLS alert.
+I will use our guessed q as the premaster secret and time the process from sending the ClientKeyExchange message to receiving the TLS alert.
 
 I use [Python-scapy-tls_ssl](https://github.com/tintinweb/scapy-ssl_tls) to implement the TLS handshake and timing process.  Since I will use RSA for key agreement, the cipher suites will be RSA_WITH_AES_256_CBC_SHA, RSA_WITH_AES_128_GCM_SHA256 or RSA_WITH_AES_256_CCM. 
 
@@ -60,7 +60,7 @@ I use [Python-scapy-tls_ssl](https://github.com/tintinweb/scapy-ssl_tls) to impl
 * SSL implementation: openssl-0.9.7 and openssl-1.0.2
 * SSL-version: TLS 1.0
 * Key size: 1024
-
+* SSLTimer and web servers are located in the same virtual machine
 #### Experiment method
 Run SSLTimer 20 times for the web server using openssl-0.9.7 and compute the average of the mean variance.
 Run SSLTimer 20 times for the web server using openssl-1.0.2 and compute the average of the mean variance.
