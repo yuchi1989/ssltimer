@@ -15,15 +15,6 @@ In this project, I will design and implement SSLTimer, a tool that can identify 
 ### Motivation
 A timing attack exploits data-dependent behaviorial charactoristics of the implementation of an algorithm. Some implementions of cryptographic algorithms including RSA are vulnerable to timing attack. In these implementations, there may exist a correlation between key and the encryption time and the time information can be exploited to infer keys. The information leaked by measuring time can also be combined with other cryptanlaysis techniques to make the attack more effective. If the implementation of SSL is vulnerable to timing attack, it will cause critical security and privacy issues. There is no existing tools focuing on testing SSL implementations with respect to the timing attack vulnerability. Thus in this project, I will propose a statistic based black-box test methodology to identify if an SSL secured web server is vulnerable to a specific timing attack. I will also design and implement a tool SSLTimer to automate the whole testing process.
 
-### Project plan
-1. Implement SSL handshake protocol to automatically collect timing samples from an SSL server.  (Done)
-2. Analyze the statistical features of the timing data to decide if it is vulnerable to timing attack. (4/3-4/12)
-3. Identify if the analysis process can be automated and complete the remaining part of this tool.  (4/13-4/20)
-
-### Project goal
-
-By collecting and analyzing timing data, I will try to explore a statistical way and automate the process to decide if an SSL server is vulnerable to timing attack on RSA decryption or if an SSL server is immune to this attack by using blinding. 
-
 ### Methodology
 
 #### Time the RSA decryption of all the possible combination of the top two bits twice, record peak features and compute the variance.
@@ -50,22 +41,46 @@ Peak feature [1, 0, 1, 0]
 Variance [0.25, 0.25, 0.25, 0.25]  
 Mean Variance 0.25  
 
-If the SSL server is vulnerable, the two peak features for two consecutive timing should be similar. We will use mean variance to decide if the SSL server is vulnerable or not. If the mean variance is 0 or close to 0, then the SSL server is vulnerable. If the mean variance is not close to 0, then the SSL server is not vulnerable.  
+If the SSL server is vulnerable, the two peak features for two consecutive timing should be similar. I will use mean variance to decide if the SSL server is vulnerable or not. If the mean variance is 0 or close to 0, then the SSL server is vulnerable. If the mean variance is not close to 0, then the SSL server is not vulnerable.  
 
 ### Implementation
-According to RFC 5246, using these cipher suite, as a client initiates a handshake with a TLS server, a 48-byte premaster secret will be encrypted using the public key of the server and sent to server in an ClientKeyExchange message. Then the server will decrypt the premaster secret with its private key. RFC 5246 requires that the 48-byte premaster secret begins with client_version(2 bytes) and followed by 46 random bytes. If the first two bytes are different from the client version, an alert "bad_record_mac" will be sent back from the server and the connection will be terminated by server. By timing the process from the clientKeyExchange message is sent to the alert "bad_record_mac" is received, we can approximate the time that the server uses to decrypt this encrypted premaster secret.  
 
+According to RFC 5246, using RSA for key agreement, as a client initiates a handshake with a TLS server, a 48-byte premaster secret will be encrypted using the public key of the server and sent to server in a ClientKeyExchange message. Then the server will decrypt the premaster secret with its private key. RFC 5246 requires that the 48-byte premaster secret begins with client_version(2 bytes) and followed by 46 random bytes. 
 
- 
+We can use any input as the premaster secret in a ClientKeyExchange message and send it to the TLS server. The server will decrypt it using the private key. But if the input does not meet the format of a 48-byte premaster secret, the TLS server will send an alert "bad_record_mac" and terminate the connection. 
+
+I will use our guessed q as the premaster secret and timing the process from sending the ClientKeyExchange message to receiving the TLS alert.
+
+I use [Python-scapy-tls_ssl](https://github.com/tintinweb/scapy-ssl_tls) to implement the TLS handshake and timing process.  Since I will use RSA for key agreement, the cipher suites will be RSA_WITH_AES_256_CBC_SHA, RSA_WITH_AES_128_GCM_SHA256 and RSA_WITH_AES_256_CCM. 
 
 ### Evaluation
 
+#### Experiment setting
+* OS: Ubuntu 16.04 VM
+* SSL implementation: Openssl-0.9.7 and Openssl-1.0.2
+* SSL-version: TLS 1.0
+* Key size: 1024
 
+#### Experiment method
+Run SSLTimer 20 times for each SSL implementation.
+#### Result
+
+Openssl-0.9.7: Average of mean variance: 0.109
+
+Openssl-1.0.2: Average of mean variance: 0.125
+
+#### Discussion
+The result is not as good as I expect. The mean variance for openssl-1.0.2 makes sense, but the mean variance for openssl-0.9.7 should be much smaller or 0. This probably results from the imprecise timing. Therefore, in future, we may try to implement SSLTimer in C and use CPU cycles to measure the time.
 
 ### Threats to Validity   
 SSLTimer cannot guarantee whether the tested servers are vulnerable or not.
 Even SSLTimer gets 0 variance as result, it still cannot guarantee the vulnerability because the blinding techniques may intentionally trick it.
 When SSLTimer gets very large variance, it means that the server is not vulnerable to this attack at this moment and this environment. (Testing the same server in different time and environments are necessary).
+
+### Future work
+* Implement SSLTimer using C socket and measure the time using CPU cycles.
+* Let the tested server be hosted in different Amazon EC2 servers, located in different cities or countries.
+* Test other SSL implementations;
 
 ### Resources
 Brumley, D., & Boneh, D. (2005). Remote timing attacks are practical. Computer Networks, 48(5), 701-716.  
