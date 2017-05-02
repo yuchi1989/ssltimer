@@ -32,8 +32,8 @@ By collecting and analyzing timing data, I will try to explore a statistical way
 <img src="https://github.com/yuchi1989/ssltimer/blob/master/result/figure_22.png" width="500"> 
 For example, the figure above is the result of timing the RSA decryption of all the possible combination of the top two bits.  
 Then the recorded peak feature is  [1, 0, 1, 0]. 1 means peak while 0 means not peak.  
-If an SSL server is vulnerable, the peak features of the two timing should be similar.
-For example, we get same peak feature for two timing, shown as follows. Then we will get 0 mean variance.  
+If an SSL server is vulnerable, the peak features of the two timing should be similar.   
+For example, we get same peak feature for two timing, shown as follows. Then we will get 0 mean variance.    
 First round:  
 Peak feature [1, 0, 1, 0]  
 Second round:  
