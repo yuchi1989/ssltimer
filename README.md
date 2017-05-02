@@ -28,9 +28,15 @@ By collecting and analyzing timing data, I will try to explore a statistical way
 
 #### Time the RSA decryption of all the possible combination of the top two bits twice, record peak features and compute the variance.
 
+#### Peak Feature
+<img src="https://github.com/yuchi1989/ssltimer/blob/master/result/figure_22.png" width="600"> 
 
-
-
+First round:  
+	Peak feature [1, 0, 1, 0]  
+Second round:  
+	Peak feature [1, 0, 1, 0]  
+Var = [0, 0, 0, 0]  
+Mean Variance = 0  
 
 
 CipherSuite: 
