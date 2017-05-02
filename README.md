@@ -30,22 +30,27 @@ By collecting and analyzing timing data, I will try to explore a statistical way
 
 #### Peak Feature
 <img src="https://github.com/yuchi1989/ssltimer/blob/master/result/figure_22.png" width="500"> 
-For example, the figure above is the result of timing the RSA decryption of all the possible combination of the top two bits.  
-Then the recorded peak feature is  [1, 0, 1, 0]. 1 means peak while 0 means not peak.  
-If an SSL server is vulnerable, the peak features of the two timing should be similar.   
-For example, we get same peak feature for two timing, shown as follows. Then we will get 0 mean variance.    
+
+The figure above is example result of timing the RSA decryption of all the possible combination of the top two bits.  
+The peak feature of the result is  [1, 0, 1, 0]. 1 means peak while 0 means not peak.  Then we will do the timing twice, get two peak features and compute the variance
+  
+For example, if we get same peak feature for two consecutive timing as follows. Then we will get 0 mean variance. 
 First round:  
 Peak feature [1, 0, 1, 0]  
 Second round:  
 Peak feature [1, 0, 1, 0]  
-Var = [0, 0, 0, 0]  
+Variance = [0, 0, 0, 0]  
 Mean Variance = 0  
 
-The mean variance range from 0 to 0.25. The mean variances in the following example is 0.25.  
-First round [0, 1, 0, 1]  
-Second round[1, 0, 1, 0]  
+The mean variance range from 0 to 0.25. The following example shows a case with maximum mean variance.  
+First round:
+Peak feature [0, 1, 0, 1]  
+Second round:
+Peak feature [1, 0, 1, 0]  
 Variance [0.25, 0.25, 0.25, 0.25]  
 Mean Variance 0.25  
+
+If the SSL server is vulnerable, the two peak features for two consecutive timing should be similar. We will use mean variance to decide if the SSL server is vulnerable or not. If the mean variance is 0 or close to 0, then the SSL server is vulnerable. If the mean variance is not close to 0, then the SSL server is not vulnerable.  
 
 ### Implementation
 * According to RFC 5246, using these cipher suite, as a client initiates a handshake with a TLS server, a 48-byte premaster secret will be encrypted using the public key of the server and sent to server in an ClientKeyExchange message. Then the server will decrypt the premaster secret with its private key. RFC 5246 requires that the 48-byte premaster secret begins with client_version(2 bytes) and followed by 46 random bytes. If the first two bytes are different from the client version, an alert "bad_record_mac" will be sent back from the server and the connection will be terminated by server. By timing the process from the clientKeyExchange message is sent to the alert "bad_record_mac" is received, we can approximate the time that the server uses to decrypt this encrypted premaster secret.  
