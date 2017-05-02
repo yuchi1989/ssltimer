@@ -70,7 +70,7 @@ Openssl-0.9.7: Average of mean variance: 0.109
 Openssl-1.0.2: Average of mean variance: 0.125
 
 #### Discussion
-The result is not as good as I expect. The mean variance for openssl-1.0.2 makes sense, but the mean variance for openssl-0.9.7 should be much smaller or 0. This probably results from the imprecise timing. Therefore, in future, we may try to implement SSLTimer in C and use CPU cycles to measure the time.
+The result is not as good as I expect. The mean variance for openssl-1.0.2 is reasonable, but the mean variance for openssl-0.9.7 should be much smaller or 0. This probably results from the imprecise timing. Therefore, in future, we may try to implement SSLTimer in C and use CPU cycles to measure the time.
 
 ### Threats to Validity   
 SSLTimer cannot guarantee whether the tested servers are vulnerable or not.
