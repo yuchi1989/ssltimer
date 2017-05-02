@@ -13,7 +13,7 @@ Yuchi Tian
 In this project, I will design and implement SSLTimer, a tool that can identify if an SSL secured web server is vulnerable to a specific timing attack by only interacting with the web server remotely. Specifically, I will use the RSA timing vulnerability discussed in [Remote Timing Attacks are Practical](https://crypto.stanford.edu/~dabo/papers/ssl-timing.pdf). 
 
 ### Motivation
-A timing attack exploits data-dependent behavioral characteristics of the implementation of an algorithm. Some implementations of cryptographic algorithms including RSA are vulnerable to timing attack. In these implementations, there may exist a correlation between key and the encryption time and the time information can be exploited to infer keys. The information leaked by measuring time can also be combined with other cryptanalysis techniques to make the attack more effective. If the implementation of SSL is vulnerable to timing attack, it will cause critical security and privacy issues. There is no existing tools focusing on testing SSL implementations with respect to the timing attack vulnerability. Thus in this project, I will propose a statistic based black-box test methodology to identify if an SSL secured web server is vulnerable to a specific timing attack. I will also design and implement a tool SSLTimer to automate the whole testing process.
+A timing attack exploits data-dependent behavioral characteristics of the implementation of an algorithm. Some implementations of cryptographic algorithms including RSA are vulnerable to timing attack. In these implementations, there may exist a correlation between key and the encryption time and the time information can be exploited to infer keys. The information leaked by measuring time can also be combined with other cryptanalysis techniques to make the attack more effective. If the implementation of SSL is vulnerable to timing attack, it will cause critical security and privacy issues. There is no existing tools focusing on black-box testing SSL implementations with respect to the timing attack vulnerability. Thus in this project, I will propose a statistic based black-box test methodology to identify if an SSL secured web server is vulnerable to a specific timing attack. I will also design and implement a tool SSLTimer to automate the whole testing process.
 
 ### Methodology
 
@@ -23,7 +23,7 @@ A timing attack exploits data-dependent behavioral characteristics of the implem
 <img src="https://github.com/yuchi1989/ssltimer/blob/master/result/figure_22.png" width="500"> 
 
 The figure above is an example result of timing the RSA decryption of all the possible combination of the top two bits.  
-The peak feature of the result is  [1, 0, 1, 0]. 1 means peak while 0 means not peak.  Then we will do the timing twice, get two peak features and compute the variance
+The peak feature of the result is  [1, 0, 1, 0]. 1 means peak while 0 means not peak.  We will do the timing twice, get two peak features and compute the variance.
   
 For example, if we get same peak feature for two consecutive timing as follows. Then we will get 0 mean variance.   
 First round:  
@@ -33,7 +33,7 @@ Peak feature [1, 0, 1, 0]
 Variance = [0, 0, 0, 0]  
 Mean Variance = 0  
 
-The mean variance range from 0 to 0.25. The following example shows a case with maximum mean variance.  
+The mean variance ranges from 0 to 0.25. The following example shows the maximum mean variance.  
 First round:  
 Peak feature [0, 1, 0, 1]  
 Second round:  
@@ -51,7 +51,7 @@ We can use any input as the premaster secret in a ClientKeyExchange message and 
 
 I will use our guessed q as the premaster secret and timing the process from sending the ClientKeyExchange message to receiving the TLS alert.
 
-I use [Python-scapy-tls_ssl](https://github.com/tintinweb/scapy-ssl_tls) to implement the TLS handshake and timing process.  Since I will use RSA for key agreement, the cipher suites will be RSA_WITH_AES_256_CBC_SHA, RSA_WITH_AES_128_GCM_SHA256 and RSA_WITH_AES_256_CCM. 
+I use [Python-scapy-tls_ssl](https://github.com/tintinweb/scapy-ssl_tls) to implement the TLS handshake and timing process.  Since I will use RSA for key agreement, the cipher suites will be RSA_WITH_AES_256_CBC_SHA, RSA_WITH_AES_128_GCM_SHA256 or RSA_WITH_AES_256_CCM. 
 
 ### Evaluation
 
@@ -75,7 +75,7 @@ The result is not as good as I expect. The mean variance for openssl-1.0.2 is re
 ### Threats to Validity   
 SSLTimer cannot guarantee whether the tested servers are vulnerable or not.
 Even SSLTimer gets 0 variance as result, it still cannot guarantee the vulnerability because the blinding techniques may intentionally trick it.
-When SSLTimer gets very large variance, it means that the server is not vulnerable to this attack at this moment and this environment. (Testing the same server in different time and environments are necessary).
+When SSLTimer gets very large variance, it means that the server is not vulnerable to this attack at this moment and this environment. We should also test the same server at different time and environments.
 
 ### Future work
 * Implement SSLTimer using C socket and measure the time using CPU cycles.
