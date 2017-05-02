@@ -29,21 +29,23 @@ By collecting and analyzing timing data, I will try to explore a statistical way
 #### Time the RSA decryption of all the possible combination of the top two bits twice, record peak features and compute the variance.
 
 #### Peak Feature
-<img src="https://github.com/yuchi1989/ssltimer/blob/master/result/figure_22.png" width="600"> 
-
+<img src="https://github.com/yuchi1989/ssltimer/blob/master/result/figure_22.png" width="500"> 
+For example, the figure above is the result of timing the RSA decryption of all the possible combination of the top two bits.  
+Then the recorded peak feature is  [1, 0, 1, 0]. 1 means peak while 0 means not peak.  
+If an SSL server is vulnerable, the peak features of the two timing should be similar.
+For example, we get same peak feature for two timing, shown as follows. Then we will get 0 mean variance.  
 First round:  
-	Peak feature [1, 0, 1, 0]  
+Peak feature [1, 0, 1, 0]  
 Second round:  
-	Peak feature [1, 0, 1, 0]  
+Peak feature [1, 0, 1, 0]  
 Var = [0, 0, 0, 0]  
 Mean Variance = 0  
 
-
-CipherSuite: 
-   * RSA_WITH_AES_256_CBC_SHA
-   * RSA_WITH_AES_128_GCM_SHA256
-   * RSA_WITH_AES_256_CCM  
-   
+The mean variance range from 0 to 0.25. The mean variances in the following example is 0.25.  
+First round [0, 1, 0, 1]  
+Second round[1, 0, 1, 0]  
+Variance [0.25, 0.25, 0.25, 0.25]  
+Mean Variance 0.25  
 
 ### Implementation
 * According to RFC 5246, using these cipher suite, as a client initiates a handshake with a TLS server, a 48-byte premaster secret will be encrypted using the public key of the server and sent to server in an ClientKeyExchange message. Then the server will decrypt the premaster secret with its private key. RFC 5246 requires that the 48-byte premaster secret begins with client_version(2 bytes) and followed by 46 random bytes. If the first two bytes are different from the client version, an alert "bad_record_mac" will be sent back from the server and the connection will be terminated by server. By timing the process from the clientKeyExchange message is sent to the alert "bad_record_mac" is received, we can approximate the time that the server uses to decrypt this encrypted premaster secret.  
