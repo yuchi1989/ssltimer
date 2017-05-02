@@ -57,30 +57,31 @@ I use [Python-scapy-tls_ssl](https://github.com/tintinweb/scapy-ssl_tls) to impl
 
 #### Experiment setting
 * OS: Ubuntu 16.04 VM
-* SSL implementation: Openssl-0.9.7 and Openssl-1.0.2
+* SSL implementation: openssl-0.9.7 and openssl-1.0.2
 * SSL-version: TLS 1.0
 * Key size: 1024
 
 #### Experiment method
-Run SSLTimer 20 times for each SSL implementation.
+Run SSLTimer 20 times for the web server using openssl-0.9.7 and compute the average of the mean variance.
+Run SSLTimer 20 times for the web server using openssl-1.0.2 and compute the average of the mean variance.
+
 #### Result
 
-Openssl-0.9.7: Average of mean variance: 0.109
+openssl-0.9.7: Average of mean variance: 0.109
 
-Openssl-1.0.2: Average of mean variance: 0.125
+openssl-1.0.2: Average of mean variance: 0.125
 
 #### Discussion
 The result is not as good as I expect. The mean variance for openssl-1.0.2 is reasonable, but the mean variance for openssl-0.9.7 should be much smaller or 0. This probably results from the imprecise timing. Therefore, in future, we may try to implement SSLTimer in C and use CPU cycles to measure the time.
 
 ### Threats to Validity   
 SSLTimer cannot guarantee whether the tested servers are vulnerable or not.
-Even SSLTimer gets 0 variance as result, it still cannot guarantee the vulnerability because the blinding techniques may intentionally trick it.
-When SSLTimer gets very large variance, it means that the server is not vulnerable to this attack at this moment and this environment. We should also test the same server at different time and environments.
+Even the mean variance of peak features is 0, we still cannot guarantee the vulnerability because the blinding techniques may intentionally trick it.
+When the mean variance of peak features is not close to 0, it means that the server is not vulnerable to this attack at this moment and this environment. We should also test the same server at different time and environments.
 
 ### Future work
 * Implement SSLTimer using C socket and measure the time using CPU cycles.
 * Let the tested server be hosted in different Amazon EC2 servers, located in different cities or countries.
-* Test other SSL implementations;
 
 ### Resources
 Brumley, D., & Boneh, D. (2005). Remote timing attacks are practical. Computer Networks, 48(5), 701-716.  
