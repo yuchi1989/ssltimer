@@ -1,37 +1,19 @@
 # ssltimer
 
 ### Title
-### [slides](https://docs.google.com/a/virginia.edu/presentation/d/134ILvlbyl5amdfGbwuomMzfeKx-8t_G-0JNtCQrmRKQ/edit?usp=sharing)
+
 #### SSLTimer: Testing an SSL Implementation with respect to Timing Attack Vulnerability
+### [slides](https://docs.google.com/a/virginia.edu/presentation/d/134ILvlbyl5amdfGbwuomMzfeKx-8t_G-0JNtCQrmRKQ/edit?usp=sharing)
 
 ### Team
 Yuchi Tian  
 
 
 ### Introduction
-In this project, I will design and implement SSLTimer, a tool that can identify if a SSL secured web server is vulnerable to a specific timing attack by only interacting with the web server remotely. Specifically, I will use the RSA timing vulnerability discussed in [Remote Timing Attacks are Practical](https://crypto.stanford.edu/~dabo/papers/ssl-timing.pdf). 
+In this project, I will design and implement SSLTimer, a tool that can identify if an SSL secured web server is vulnerable to a specific timing attack by only interacting with the web server remotely. Specifically, I will use the RSA timing vulnerability discussed in [Remote Timing Attacks are Practical](https://crypto.stanford.edu/~dabo/papers/ssl-timing.pdf). 
 
 ### Motivation
 A timing attack exploits data-dependent behaviorial charactoristics of the implementation of an algorithm. Some implementions of cryptographic algorithms including RSA are vulnerable to timing attack. In these implementations, there may exist a correlation between key and the encryption time and the time information can be exploited to infer keys. The information leaked by measuring time can also be combined with other cryptanlaysis techniques to make the attack more effective. If the implementation of SSL is vulnerable to timing attack, it will cause critical security and privacy issues. There is no existing tools focuing on testing SSL implementations with respect to the timing attack vulnerability. Thus in this project, I will propose a statistic based black-box test methodology to identify if an SSL secured web server is vulnerable to a specific timing attack. I will also design and implement a tool SSLTimer to automate the whole testing process.
-
-  
-### Methodology
-CipherSuite: 
-   * RSA_WITH_AES_256_CBC_SHA
-   * RSA_WITH_AES_128_GCM_SHA256
-   * RSA_WITH_AES_256_CCM  
-   
-SSL:
-   * openssl 0.9.7a
-   * openssl 0.9.8
-   * openssl 1.0.2  
-
-Protocol version:
-  * SSLv3 - TLSv1.2
-  
-Timer:  
-* According to RFC 5246, using these cipher suite, as a client initiates a handshake with a TLS server, a 48-byte premaster secret will be encrypted using the public key of the server and sent to server in an ClientKeyExchange message. Then the server will decrypt the premaster secret with its private key. RFC 5246 requires that the 48-byte premaster secret begins with client_version(2 bytes) and followed by 46 random bytes. If the first two bytes are different from the client version, an alert "bad_record_mac" will be sent back from the server and the connection will be terminated by server. By timing the process from the clientKeyExchange message is sent to the alert "bad_record_mac" is received, we can approximate the time that the server uses to decrypt this encrypted premaster secret.  
-
 
 ### Project plan
 1. Implement SSL handshake protocol to automatically collect timing samples from an SSL server.  (Done)
@@ -40,7 +22,28 @@ Timer:
 
 ### Project goal
 
-By collecting and analyzing timing data, I will try to explore a statistical way and automate the process to decide if an SSL server is vulnerable to timing attack on RSA decryption or if an SSL server is immune to this attack by using blinding.  
+By collecting and analyzing timing data, I will try to explore a statistical way and automate the process to decide if an SSL server is vulnerable to timing attack on RSA decryption or if an SSL server is immune to this attack by using blinding. 
+
+### Methodology
+
+#### Time the RSA decryption of all the possible combination of the top two bits twice, record peak features and compute the variance.
+
+
+
+
+
+
+CipherSuite: 
+   * RSA_WITH_AES_256_CBC_SHA
+   * RSA_WITH_AES_128_GCM_SHA256
+   * RSA_WITH_AES_256_CCM  
+   
+
+### Implementation
+* According to RFC 5246, using these cipher suite, as a client initiates a handshake with a TLS server, a 48-byte premaster secret will be encrypted using the public key of the server and sent to server in an ClientKeyExchange message. Then the server will decrypt the premaster secret with its private key. RFC 5246 requires that the 48-byte premaster secret begins with client_version(2 bytes) and followed by 46 random bytes. If the first two bytes are different from the client version, an alert "bad_record_mac" will be sent back from the server and the connection will be terminated by server. By timing the process from the clientKeyExchange message is sent to the alert "bad_record_mac" is received, we can approximate the time that the server uses to decrypt this encrypted premaster secret.  
+
+
+ 
 
 ### Evaluation
 Timing data distribution with same input
